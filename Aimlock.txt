@@ -4,7 +4,7 @@ local pcall, getgenv, next, setmetatable, Vector2new, CFramenew, Color3fromRGB, 
 
 --// Launching checks
 
-if not getgenv().Phobia or getgenv().Phobia.Aimbot then return end
+if not getgenv().Phobia or getgenv().Phobia.Aimlock then return end
 
 --// Services
 
@@ -21,7 +21,7 @@ local RequiredDistance, Typing, Running, ServiceConnections, Animation, Original
 
 --// Environment
 
-getgenv().Phobia.Aimbot = {
+getgenv().Phobia.Aimlock = {
 	Settings = {
 		Enabled = false,
 		TeamCheck = false,
@@ -50,7 +50,7 @@ getgenv().Phobia.Aimbot = {
 	FOVCircle = Drawingnew("Circle")
 }
 
-local Environment = getgenv().Phobia.Aimbot
+local Environment = getgenv().Phobia.Aimlock
 
 --// Core Functions
 
@@ -185,8 +185,8 @@ function Environment.Functions:Exit()
 
 	Environment.FOVCircle:Remove()
 
-	getgenv().Phobia.Aimbot.Functions = nil
-	getgenv().Phobia.Aimbot = nil
+	getgenv().Phobia.Aimlock.Functions = nil
+	getgenv().Phobia.Aimlock = nil
 
 	Load = nil; ConvertVector = nil; CancelLock = nil; GetClosestPlayer = nil;
 end
