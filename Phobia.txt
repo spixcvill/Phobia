@@ -14,8 +14,8 @@ getgenv().AirHub = {}
 
 --// Load Modules
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Exunys/AirHub/main/Modules/Aimbot.lua"))()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Exunys/AirHub/main/Modules/Wall%20Hack.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/spixcvill/Phobia/main/Aimlock.txt"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/spixcvill/Phobia/main/ESP.txt"))()
 
 --// Variables
 
