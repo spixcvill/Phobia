@@ -35,7 +35,7 @@ local MainFrame = Library:CreateWindow({
 	Name = "Phobia",
 	Themeable = {
 		Image = false,
-		Info = "Made by fuckstuff & ezjv",
+		Info = "Made by fuckstuff & ezvj",
 		Credit = false
 	},
 	Background = "",
