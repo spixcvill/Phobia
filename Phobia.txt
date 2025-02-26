@@ -22,6 +22,10 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/spixcvill/Phobia/main
 local Library = loadstring(game:GetObjects("rbxassetid://7657867786")[1].Source)() -- Pepsi's UI Library
 local Aimlock, ESP = getgenv().Phobia.Aimlock, getgenv().Phobia.ESP
 local Parts, Fonts, TracersType = {"Head", "HumanoidRootPart", "Torso", "Left Arm", "Right Arm", "Left Leg", "Right Leg", "LeftHand", "RightHand", "LeftLowerArm", "RightLowerArm", "LeftUpperArm", "RightUpperArm", "LeftFoot", "LeftLowerLeg", "UpperTorso", "LeftUpperLeg", "RightFoot", "RightLowerLeg", "LowerTorso", "RightUpperLeg"}, {"UI", "System", "Plex", "Monospace"}, {"Bottom", "Center", "Mouse"}
+local cframespeedtoggle = false
+local speedvalue = 2
+local flying = false
+
 
 --// Frame
 
@@ -67,10 +71,208 @@ local OthersTab = MainFrame:CreateTab({
 
 --// Other Sections
 
-local Player = OthersTab:CreateSection({
-	Name = "CFrame"
+local OthersSection = OthersTab:CreateSection({
+    Name = "Others"
 })
 
+--// CFrame Section
+
+local CFrameTab = OthersTab:CreateSection({
+    Name = "CFrame"
+})
+
+--// Fly Section
+local FlyTab = OthersTab:CreateSection({
+    Name = "Fly (Not working)"
+})
+
+--// Hipheight Section
+local HipheightTab = OthersTab:CreateSection({
+    Name = "Hipheight"
+})
+
+-- Переменная для отслеживания состояния включения
+local hipHeightEnabled = false
+local currentHipHeight = 2 -- Стандартное значение HipHeight
+
+-- Функция для изменения HipHeight
+local function updateHipHeight(newHeight)
+    local player = game.Players.LocalPlayer
+    local character = player.Character
+    if character and character:FindFirstChild("Humanoid") then
+        character.Humanoid.HipHeight = newHeight
+    end
+end
+
+-- Добавляем тоггл (кнопку включения/выключения)
+HipheightTab:AddToggle({
+    Name = "Enabled",
+    Value = false,
+    Callback = function(isEnabled)
+        hipHeightEnabled = isEnabled
+        if not isEnabled then
+            -- Если выключено, сбрасываем на стандартное значение
+            updateHipHeight(2)
+        end
+    end
+})
+
+-- Добавляем ползунок для управления значением HipHeight
+HipheightTab:AddSlider({
+    Name = "Hip Height Value",
+    Value = currentHipHeight,
+    Min = 0,
+    Max = 5, -- Максимальное значение можно изменить по необходимости
+    Increment = 0.1,
+    Callback = function(newHeight)
+        if hipHeightEnabled then
+            updateHipHeight(newHeight)
+        end
+    end
+})
+
+--// Fly Function
+local function Fly()
+    local plr = game.Players.LocalPlayer
+    local mouse = plr:GetMouse()
+
+    repeat wait() until plr and plr.Character and plr.Character:FindFirstChild("Torso") and plr.Character:FindFirstChild("Humanoid")
+
+    local torso = plr.Character.Torso
+    local ctrl = { f = 0, b = 0, l = 0, r = 0 }
+    local lastctrl = { f = 0, b = 0, l = 0, r = 0 }
+    local maxspeed = 50
+    local speed = 0
+
+    -- Create BodyGyro and BodyVelocity instances
+    local bg = Instance.new("BodyGyro", torso)
+    bg.P = 9e4
+    bg.maxTorque = Vector3.new(9e9, 9e9, 9e9)
+    bg.cframe = torso.CFrame
+
+    local bv = Instance.new("BodyVelocity", torso)
+    bv.velocity = Vector3.new(0, 0.1, 0)
+    bv.maxForce = Vector3.new(9e9, 9e9, 9e9)
+
+    -- Flying loop
+    while flying do
+        wait()
+
+        plr.Character.Humanoid.PlatformStand = true
+
+        -- Adjust speed based on input
+        if ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0 then
+            speed = speed + 0.5 + (speed / maxspeed)
+            if speed > maxspeed then
+                speed = maxspeed
+            end
+        elseif not (ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0) and speed ~= 0 then
+            speed = speed - 1
+            if speed < 0 then
+                speed = 0
+            end
+        end
+
+        -- Update velocity and gyro
+        if (ctrl.l + ctrl.r) ~= 0 or (ctrl.f + ctrl.b) ~= 0 then
+            bv.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (ctrl.f + ctrl.b)) +
+                ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(ctrl.l + ctrl.r, (ctrl.f + ctrl.b) * 0.2, 0).p) -
+                game.Workspace.CurrentCamera.CoordinateFrame.p)) * speed
+            lastctrl = { f = ctrl.f, b = ctrl.b, l = ctrl.l, r = ctrl.r }
+        elseif (ctrl.l + ctrl.r) == 0 and (ctrl.f + ctrl.b) == 0 and speed ~= 0 then
+            bv.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (lastctrl.f + lastctrl.b)) +
+                ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(lastctrl.l + lastctrl.r, (lastctrl.f + lastctrl.b) * 0.2, 0).p) -
+                game.Workspace.CurrentCamera.CoordinateFrame.p)) * speed
+        else
+            bv.velocity = Vector3.new(0, 0.1, 0)
+        end
+
+        bg.cframe = game.Workspace.CurrentCamera.CoordinateFrame * CFrame.Angles(-math.rad((ctrl.f + ctrl.b) * 50 * speed / maxspeed), 0, 0)
+    end
+
+    -- Cleanup
+    ctrl = { f = 0, b = 0, l = 0, r = 0 }
+    lastctrl = { f = 0, b = 0, l = 0, r = 0 }
+    speed = 0
+    bg:Destroy()
+    bv:Destroy()
+    plr.Character.Humanoid.PlatformStand = false
+end
+
+--// Keybindings for movement
+local function SetupKeyBindings()
+    local mouse = game.Players.LocalPlayer:GetMouse()
+
+    mouse.KeyDown:Connect(function(key)
+        if key:lower() == "w" then
+            ctrl.f = 1
+        elseif key:lower() == "s" then
+            ctrl.b = -1
+        elseif key:lower() == "a" then
+            ctrl.l = -1
+        elseif key:lower() == "d" then
+            ctrl.r = 1
+        end
+    end)
+
+    mouse.KeyUp:Connect(function(key)
+        if key:lower() == "w" then
+            ctrl.f = 0
+        elseif key:lower() == "s" then
+            ctrl.b = 0
+        elseif key:lower() == "a" then
+            ctrl.l = 0
+        elseif key:lower() == "d" then
+            ctrl.r = 0
+        end
+    end)
+end
+
+--// Enable/Disable Flying
+FlyTab:AddToggle({
+    Name = "Enable Fly",
+    Value = false,
+    Callback = function(isEnabled)
+        if isEnabled then
+            flying = true
+            SetupKeyBindings()
+            Fly()
+        else
+            flying = false
+        end
+    end
+})
+
+--// CFrame Settings
+CFrameTab:AddToggle({
+    Name = "Enabled",
+    Value = false,
+    Callback = function(isEnabled)
+        cframespeedtoggle = isEnabled
+    end
+})
+
+CFrameTab:AddSlider({
+    Name = "CFrame Speed",
+    Value = speedvalue,
+    Min = 0,
+    Max = 10,
+    Increment = 0.1,
+    Callback = function(newSpeed)
+        speedvalue = newSpeed
+    end
+})
+
+--// Applying CFrame Speed
+game:GetService("RunService").Heartbeat:Connect(function()
+    if cframespeedtoggle then
+        local character = game.Players.LocalPlayer.Character
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            character.HumanoidRootPart.CFrame = character.HumanoidRootPart.CFrame +
+                character.Humanoid.MoveDirection * speedvalue / 2.5
+        end
+    end
+end)
 --// Aimlock Sections
 
 local Values = AimlockTab:CreateSection({
