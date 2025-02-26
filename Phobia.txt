@@ -44,6 +44,10 @@ local MainFrame = Library:CreateWindow({
 
 --// Tabs
 
+local OthersTab = MainFrame:CreateTab({
+	Name = "Others"
+})
+
 local AimlockTab = MainFrame:CreateTab({
 	Name = "Aimlock"
 })
@@ -53,16 +57,13 @@ local VisualsTab = MainFrame:CreateTab({
 })
 
 local CrosshairTab = MainFrame:CreateTab({
-	Name = "Others"
+	Name = "Crosshair"
 })
 
 local FunctionsTab = MainFrame:CreateTab({
 	Name = "Functions"
 })
 
-local OthersTab = MainFrame:CreateTab({
-	Name = "Others"
-})
 --// Aimlock Sections
 
 local Values = AimlockTab:CreateSection({
