@@ -91,11 +91,10 @@ local HipheightTab = OthersTab:CreateSection({
     Name = "Hipheight"
 })
 
--- Переменная для отслеживания состояния включения
 local hipHeightEnabled = false
 local currentHipHeight = 2 -- Стандартное значение HipHeight
 
--- Функция для изменения HipHeight
+
 local function updateHipHeight(newHeight)
     local player = game.Players.LocalPlayer
     local character = player.Character
@@ -104,7 +103,6 @@ local function updateHipHeight(newHeight)
     end
 end
 
--- Добавляем тоггл (кнопку включения/выключения)
 HipheightTab:AddToggle({
     Name = "Enabled",
     Value = false,
@@ -117,7 +115,6 @@ HipheightTab:AddToggle({
     end
 })
 
--- Добавляем ползунок для управления значением HipHeight
 HipheightTab:AddSlider({
     Name = "Hip Height Value",
     Value = currentHipHeight,
