@@ -92,7 +92,7 @@ local HipheightTab = OthersTab:CreateSection({
 })
 
 local hipHeightEnabled = false
-local currentHipHeight = 2 -- Стандартное значение HipHeight
+local currentHipHeight = 2 
 
 
 local function updateHipHeight(newHeight)
@@ -109,7 +109,7 @@ HipheightTab:AddToggle({
     Callback = function(isEnabled)
         hipHeightEnabled = isEnabled
         if not isEnabled then
-            -- Если выключено, сбрасываем на стандартное значение
+            
             updateHipHeight(2)
         end
     end
@@ -119,7 +119,7 @@ HipheightTab:AddSlider({
     Name = "Hip Height Value",
     Value = currentHipHeight,
     Min = 0,
-    Max = 5, -- Максимальное значение можно изменить по необходимости
+    Max = 5, 
     Increment = 0.1,
     Callback = function(newHeight)
         if hipHeightEnabled then
