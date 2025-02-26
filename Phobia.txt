@@ -53,12 +53,13 @@ local VisualsTab = MainFrame:CreateTab({
 })
 
 local CrosshairTab = MainFrame:CreateTab({
-	Name = "Crosshair"
+	Name = "Others"
 })
 
 local FunctionsTab = MainFrame:CreateTab({
 	Name = "Functions"
 })
+
 local OthersTab = MainFrame:CreateTab({
 	Name = "Others"
 })
@@ -134,6 +135,13 @@ local CrosshairSettings_CenterDot = CrosshairTab:CreateSection({
 
 local FunctionsSection = FunctionsTab:CreateSection({
 	Name = "Functions"
+})
+
+
+--// Others Section
+
+local OtherSection = OtherTab:CreateSection({
+	Name = "Others"
 })
 
 --// Aimlock Values
