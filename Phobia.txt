@@ -141,7 +141,7 @@ local FunctionsSection = FunctionsTab:CreateSection({
 
 --// Others Section
 
-local OtherSection = OtherTab:CreateSection({
+local OthersSection = OthersTab:CreateSection({
 	Name = "Others"
 })
 
