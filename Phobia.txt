@@ -59,7 +59,7 @@ local CrosshairTab = MainFrame:CreateTab({
 local FunctionsTab = MainFrame:CreateTab({
 	Name = "Functions"
 })
-local FunctionsTab = MainFrame:CreateTab({
+local OthersTab = MainFrame:CreateTab({
 	Name = "Others"
 })
 --// Aimlock Sections
