@@ -64,6 +64,13 @@ local OthersTab = MainFrame:CreateTab({
 	Name = "Others"
 })
 
+
+--// Other Sections
+
+local Player = OthersTab:CreateSection({
+	Name = "CFrame"
+})
+
 --// Aimlock Sections
 
 local Values = AimlockTab:CreateSection({
