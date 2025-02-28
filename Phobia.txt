@@ -25,7 +25,6 @@ local Parts, Fonts, TracersType = {"Head", "HumanoidRootPart", "Torso", "Left Ar
 local cframespeedtoggle = false
 local speedvalue = 2
 local flying = false
-local noclipEnabled = false
 
 --// Frame
 
@@ -91,31 +90,146 @@ local HipheightTab = OthersTab:CreateSection({
     Name = "Hipheight"
 })
 
+local flyEnabled = false
+local flySpeed = 50
 
-local function toggleNoClip(state)
+local function toggleFly(state)
     local player = game.Players.LocalPlayer
     local character = player.Character
     if not character then return end
 
-    for _, part in ipairs(character:GetDescendants()) do
-        if part:IsA("BasePart") and part ~= character.HumanoidRootPart then
-            part.CanCollide = not state
-        end
+    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+    if not humanoidRootPart then return end
+
+    if state then
+        humanoidRootPart.Anchored = true
+        print("Fly mode activated!")
+    else
+        humanoidRootPart.Anchored = false
+        print("Fly mode deactivated!")
     end
 end
 
---// Create Noclip Section
+-- Applying Fly Movement Logic
+game:GetService("RunService").RenderStepped:Connect(function(deltaTime)
+    if not flyEnabled then return end
+
+    local player = game.Players.LocalPlayer
+    local character = player.Character
+    if not character then return end
+
+    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+    if not humanoidRootPart then return end
+
+    local camera = workspace.CurrentCamera
+    if not camera then return end
+
+    local moveVector = Vector3.new(0, 0, 0)
+    local cameraCFrame = camera.CFrame
+    local forwardVector = cameraCFrame.LookVector
+    local rightVector = cameraCFrame.RightVector
+
+    local userInputService = game:GetService("UserInputService")
+
+    if userInputService:IsKeyDown(Enum.KeyCode.W) then
+        moveVector = moveVector + forwardVector
+    end
+    if userInputService:IsKeyDown(Enum.KeyCode.S) then
+        moveVector = moveVector - forwardVector
+    end
+    if userInputService:IsKeyDown(Enum.KeyCode.A) then
+        moveVector = moveVector - rightVector
+    end
+    if userInputService:IsKeyDown(Enum.KeyCode.D) then
+        moveVector = moveVector + rightVector
+    end
+    if userInputService:IsKeyDown(Enum.KeyCode.Space) then
+        moveVector = moveVector + Vector3.new(0, 1, 0)
+    end
+    if userInputService:IsKeyDown(Enum.KeyCode.LeftShift) then
+        moveVector = moveVector - Vector3.new(0, 1, 0)
+    end
+
+    if moveVector.Magnitude > 0 then
+        moveVector = moveVector.Unit
+    end
+
+    -- Update position locally
+    humanoidRootPart.CFrame = CFrame.new(humanoidRootPart.Position + moveVector * flySpeed * deltaTime)
+
+    -- Send position update to server
+    PositionUpdateEvent:FireServer(humanoidRootPart.Position)
+end)
+
+-- Add Toggle for Fly
+FlyTab:AddToggle({
+    Name = "Enabled(Use Space and LShift)",
+    Value = false,
+    Callback = function(isEnabled)
+        flyEnabled = isEnabled
+        toggleFly(flyEnabled)
+    end
+})
+
+-- Add Slider for Fly Speed
+FlyTab:AddSlider({
+    Name = "Fly Speed",
+    Value = flySpeed,
+    Min = 10,
+    Max = 100,
+    Increment = 1,
+    Callback = function(newSpeed)
+        flySpeed = newSpeed
+    end
+})
+
+--// Noclip Section
 local NoclipTab = OthersTab:CreateSection({
     Name = "Noclip"
 })
+
+--// Define noclip variables and functions
+local noclipEnabled = false
+local noclipConnection = nil
+
+function noclip()
+    local function Nocl()
+        if game.Players.LocalPlayer.Character then
+            for _, v in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+                if v:IsA("BasePart") and v.CanCollide then
+                    v.CanCollide = false
+                end
+            end
+        end
+    end
+    noclipConnection = game:GetService("RunService").Stepped:Connect(Nocl)
+end
+
+function clip()
+    if noclipConnection then
+        noclipConnection:Disconnect()
+        noclipConnection = nil
+    end
+    if game.Players.LocalPlayer.Character then
+        for _, v in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+            if v:IsA("BasePart") then
+                v.CanCollide = true
+            end
+        end
+    end
+end
 
 --// Add Toggle for NoClip
 NoclipTab:AddToggle({
     Name = "Enabled",
     Value = false,
     Callback = function(isEnabled)
+        if isEnabled then
+            noclip()
+        else
+            clip()
+        end
         noclipEnabled = isEnabled
-        toggleNoClip(noclipEnabled)
     end
 })
 
